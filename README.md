@@ -7,6 +7,9 @@ https://github.com/justinfrench/formtastic
 gem 'formtastic', '~> 3.0'
 rails g formtastic:install
 
+rails g formtastic:input string --extend
+rails g formtastic:input string --extend
+
 ```
 
 ```html
@@ -138,6 +141,69 @@ rails g formtastic:install
   <%= f.semantic_errors :state %>
 <% end %>
   
+  
+<%= semantic_form_for @post do |f| %>  
+  <%= f.inputs do %>
+    <%= f.input :title %>
+    <%= f.input :body %>
+    <%= f.input :section %>
+  <% end %>
+<% end %>
+  
+Formatastic::FormBuilder.i18n_lookups_by_default = true
+  
+<%= semantic_form_for Post.new do |f| %>
+  <%= f.inputs do %>
+    <%= f.input :title %>
+    <%= f.input :body %>
+    <%= f.input :section %>
+  <% end %>
+  <%= f.action do %>
+    <%= f.action :submit %>
+  <% end %>
+<% end %>
+  
+<%= semantic_form_for @post do |f| %>
+  <%= f.inputs.:post_details do %>
+  <% end %>
+<% end %>
+  
+<%= semantic_form @post do |f| %>
+  <%= f.inputs do %>
+    <%= f.input :title %>
+    <%= f.input :body, :hint => false %>
+    <%= f.input :section, :label => 'Some section' %>
+  <% end %>
+  <%= f.actions do %>
+    <%= f.action :submit, :label => :dumie %>
+  <% end %>
+<% end %>
+  
+<%= semantic_form_for @post do |f| %>  
+  <%= f.inputs do %>
+    <%= f.input :title, :label => true %>
+    <%= f.input :body, :label => true %>
+    <%= f.input :section, :label => true %>
+  <% end %>
+  <%= f.actions do %>
+    <%= f.action :submit, :label => true %>
+  <% end %>
+<% end %>  
+  
+<%= semantic_form @post do |f| %>
+  <%= f.inputs do %>
+    <%= f.input :title, :label => true %>
+    <%= f.input :body, :label => true %>
+    <%= f.input :section, :label => true %>
+  <% end %>
+  <%= f.actions do %>
+    <%= f.action :submit, :label => true%>
+  <% end %>
+<% end %>
+  
+<%= semantic_form_for @post do |f| %>
+  <%= f.semantic_errors :state %>
+<% end %>
 ```
 
 ```ruby
@@ -151,6 +217,46 @@ class StringInput < Formtastic::Inputs::StringInput
   def to_html
     puts "this is my modified version of StringInput"
     super
+  end
+end
+
+f.input :authors, :as => :check_boxes, :collection => User.order().all
+f.input :authors, :as => :check_boxes, :collection => current_user.company.users.activate
+f.input :authors, :as => :check_boxes, :collection => [@justin, @kate]
+f.input :authors, :as => :check_boxes, :collection => ["Justin", "Kate", "Amelia", "Gus", "Meg"]
+f.input :author, :as => :check_boxes, :collection => Author.all
+f.input :author, :as => :select, :collection => Author.pluck(:first_name, :id)
+f.input :author, :as => :select, :collection => Author.pluck(Arel.sql("CONCAT(`first_name`, ' ', `last_name`)"), :id)
+f.input :author, :as => :select, :collection => Author.your_custom_scope_or_class_method
+f.input :author, :as => :select, :collection => { @justin.name => @justin.id, @kate.name => @kate.id }
+f.input :author, :as => :select, :collection => ["Justin", "Kate", "Amelia", "Gus", "Meg"]
+f.input :author, :as => :radio, :collection => User.all
+f.input :author, :as => :radio, :collection => [@justin, @kate]
+f.input :author, :as => :radio, :collection => { @justin.name => @justin.id, @kate.name => @kate.id }
+f.input :author, :as => :radio, :collection => { @justin.name => @justin.id, @kate.name => @kate.id }
+f.input :author, :as => :radio, :collection => ["Justin", "Kate", "Amelia", "Gus", "Meg"]
+f.input :author, :as => :radio, :collection => ["Yes!", "No"]
+f.input :author, :as => :radio, :collection => Hash[Book.all.map {|b| [b.name,b.id]}]
+f.input :author, :as => :datalist, :collection => Book.pluck(:name)
+
+Formtastic::FormBuilder.i18n_lookups_by_default = false
+
+class String Input < Formtastic::Inputs::StringInput
+  def to_html
+    puts "this is my modified version of StringInput"
+    super
+  end
+end
+
+class FlexibleTextInput < Formastic::Inputs::StringInput
+  def input_html_options
+    super.merge(:class => "flexible-text-area")
+  end
+end
+
+class DatePickerInput
+  include Formtastic::Inputs::Base
+  def to_html
   end
 end
 
@@ -177,5 +283,45 @@ en:
         edit:
           title: "Edit title"
           body: "Edit body"
+
+en:
+  formtastic:
+    titles:
+      post_details: "Post details"
+    labels:
+      post:
+        tilte: "Your Title"
+        body: "Write something..."
+        edit:
+          title: "Edit title"
+    hints:
+      post:
+        title: "Choose a good title for your post."
+        body: "Write something inspiring here."
+    placeholders:
+      post:
+        title: "Title your post"
+        slug: "Leave blank for an automatically generated slug"
+      user:
+        create: "Create my %{model}"
+        update: "Save changes"
+        reset: "Reset form"
+        cancel: "Cancel and go back"
+        dumie: "Launch!"
+  
+en:
+  formtastic:
+    labels:
+      title: "Title"
+      article:
+        body: "Article content"
+      post:
+        new:
+          title: "Choose a title..."
+          body: "Write something..."
+        edit:
+          title: "Edit title"
+          body: "Edit body"
+          
 ```
 
